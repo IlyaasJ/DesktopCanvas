@@ -1,0 +1,60 @@
+html, body { margin: 0; overflow: hidden; background: transparent; }
+canvas { display: block; cursor: crosshair; }
+
+#badge {
+  position: fixed; top: 8px; right: 8px; padding: 4px 10px;
+  font: 12px sans-serif; color: white; background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px; pointer-events: none;
+}
+
+/* ---- Toolbar ---- */
+#ui {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);   /* centers it horizontally */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;                   /* sits above the canvas */
+}
+
+#notch {
+  width: 60px;
+  height: 18px;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  font: 12px sans-serif;
+  text-align: center;
+  line-height: 18px;
+  border-radius: 0 0 10px 10px;  /* rounded bottom corners only */
+  cursor: pointer;
+}
+
+#toolbar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 0 0 12px 12px;
+}
+
+#toolbar.hidden { display: none; }
+
+button {
+  font: 12px sans-serif;
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+button:hover { background: rgba(255, 255, 255, 0.3); }
+
+button.color {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+}
