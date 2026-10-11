@@ -6,6 +6,33 @@ canvas.height = window.innerHeight
 
 let color = '#ff3b30', size = 3, erasing = false
 
+
+let drawMode = true   // matches `drawing = true` in main.js
+let icons = {}
+
+//Sets all Icons
+function toggleIcon(name, on) {
+  return icons[`${name}-${on ? 'on' : 'off'}`] ?? ''
+}
+
+function setModeIcon(on) {
+  document.getElementById('mode').innerHTML = toggleIcon('paint', on)
+}
+
+function setEraserIcon(on) {
+  document.getElementById('eraser').innerHTML = toggleIcon('eraser', on)
+}
+
+async function init() {
+    icons = await window.api.all()
+    setModeIcon(drawMode)
+    setEraserIcon(erasing)
+    notch.innerHTML = icons['chevron-down'] ?? '▾'
+}
+init()
+
+console.log(icons)
+
 const strokes = []     // finished strokes
 let redoStack = []     // undone strokes, available for redo
 let current = null     // the stroke being drawn right now
@@ -75,8 +102,13 @@ function clearAll() {
   redraw()
 }
 
+function toggleIcon(name, on) {
+  return icons[`${name}-${on ? 'on' : 'off'}`] ?? ''
+}
+
+
 // Keyboard shortcuts: 1-4 colors, E eraser, [ ] size, Ctrl+Z / Ctrl+Y undo / redo
-const colors = { '1': '#ff3b30', '2': '#34c759', '3': '#0a84ff', '4': '#ffd60a' }
+const colors = { '1': '#000000', '2': '#FFFFFF', '3': '#0a84ff', '4': '#ffd60a' }
 window.addEventListener('keydown', (e) => {
   if (e.ctrlKey || e.metaKey) {
     if (e.key === 'z') undo()
@@ -85,13 +117,17 @@ window.addEventListener('keydown', (e) => {
   }
   if (colors[e.key]) { color = colors[e.key]; erasing = false }
   if (e.key === 'e') erasing = !erasing
-  if (e.key === '[') size = Math.max(1, size - 1)
-  if (e.key === ']') size += 1
+  if (e.key === '[') size = Math.max(1, size - 3)
+  if (e.key === ']') size += 3
 })
 
 // Messages from main.js
 window.api.onClear(clearAll)
-window.api.onMode((on) => (badge.textContent = on ? 'DRAW' : 'PASS-THROUGH'))
+window.api.onMode((on) => {
+  badge.textContent = on ? 'DRAW' : 'PASS'
+  drawMode = on
+  setModeIcon(on)
+})
 
 // ---- Toolbar ----
 const ui = document.getElementById('ui')
@@ -103,8 +139,13 @@ ui.addEventListener('mouseenter', () => window.api.setInteractive(true))
 ui.addEventListener('mouseleave', () => window.api.setInteractive(false))
 
 // Notch expands/collapses the toolbar
-notch.addEventListener('click', () => toolbar.classList.toggle('hidden'))
+notch.addEventListener('click', () => {
+  const open = ui.classList.toggle('open');
+  toolbar.classList.toggle('hidden', !open);
+  //notch.textContent = open ? '▴' : '▾';
+});
 
+//Colors
 document.querySelectorAll('.color').forEach((btn) => {
   btn.addEventListener('click', () => {
     color = btn.dataset.color
@@ -112,9 +153,43 @@ document.querySelectorAll('.color').forEach((btn) => {
   })
 })
 
-document.getElementById('eraser').addEventListener('click', () => (erasing = !erasing))
+//Color Wheel
+const wheel = document.getElementById('wheel');
+const wheelInput = document.getElementById('wheel-input');
+let applying = false;
+
+wheel.addEventListener('click', () => {
+  if (!applying) wheelInput.click();   // open the picker on a real click
+});
+
+wheelInput.addEventListener('input', () => {
+  wheel.dataset.color = wheelInput.value;
+  applying = true;
+  wheel.click();                       // reuse your existing .color handler
+  applying = false;
+});
+
+document.getElementById('eraser').innerHTML = toggleIcon("eraser", erasing)
+document.getElementById('eraser').addEventListener('click', () => {
+    erasing = !erasing
+    document.getElementById('eraser').innerHTML = toggleIcon("eraser", erasing);
+})
 document.getElementById('undo').addEventListener('click', undo)
 document.getElementById('redo').addEventListener('click', redo)
 document.getElementById('clear').addEventListener('click', clearAll)
-document.getElementById('mode').addEventListener('click', () => window.api.toggleMode())
+
+document.getElementById('mode').addEventListener('click', () => {
+    window.api.toggleMode();
+
+    document.getElementById('mode').innerHTML = toggleIcon("paint", drawMode);
+})
+
+
 document.getElementById('quit').addEventListener('click', () => window.api.quit())
+document.getElementById('save').addEventListener('click', () => {
+    const dataURL = canvas.toDataURL("image/png")
+
+    const base64Data = dataURL.replace(/^data:image\/png;base64,/, "");
+
+    window.api.save(base64Data);
+})

@@ -3,27 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <title>Annotator</title>
-  <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <canvas id="c"></canvas>
-  <div id="badge">DRAW</div>
+    <body>
+    <canvas id="c"></canvas>
+    <div id="badge">DRAW</div>
 
-  <div id="ui">
-    <div id="notch">▾</div>
-    <div id="toolbar" class="hidden">
-      <button class="color" data-color="#ff3b30" style="background:#ff3b30"></button>
-      <button class="color" data-color="#34c759" style="background:#34c759"></button>
-      <button class="color" data-color="#0a84ff" style="background:#0a84ff"></button>
-      <button class="color" data-color="#ffd60a" style="background:#ffd60a"></button>
-      <button id="eraser">Eraser</button>
-      <button id="undo">Undo</button>
-      <button id="redo">Redo</button>
-      <button id="clear">Clear</button>
-      <button id="mode">Draw / Pass</button>
-      <button id="quit">Quit</button>
+    <div id="ui">
+	<div id="notch">▾</div>
+	<div id="toolbar" class="hidden">
+	    <div id="colors">
+		<button class="color" data-color="#000000" style="background:#000000"></button>
+		<button class="color" data-color="#FFFFFF" style="background:#FFFFFF"></button>
+		<button class="color" data-color="#ff3b30" style="background:#ff3b30"></button>
+		<button class="color" data-color="#ffd60a" style="background:#ffd60a"></button>
+		<button class="color" data-color="#ff9500" style="background:#ff9500"></button>
+		<button class="color" data-color="#af52de" style="background:#af52de"></button>
+		<button class="color" data-color="#ff2d92" style="background:#ff2d92"></button>
+
+		<!-- 8th: color wheel -->
+		<button id="wheel" class="color" data-color="#ffffff"></button>
+		<input type="color" id="wheel-input" value="#ffffff">
+	    </div>
+
+	    <button id="eraser"></button>
+	    <button id="mode"></button>
+	    <button id="undo">Undo</button>
+	    <button id="redo">Redo</button>
+	    <button id="clear">Clear</button>
+	    <button id="save">Save</button>
+	    <button id="quit">Quit</button>
+	</div>
     </div>
-  </div>
 
   <script src="renderer.js"></script>
 </body>
