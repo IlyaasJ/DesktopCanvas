@@ -1,75 +1,46 @@
-# <img width="50" height="50" alt="DesktopCanvasIcon" src="https://github.com/user-attachments/assets/6154871f-ab14-4b8a-bd3a-d7f23f333648" /> DesktopCanvas
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6154871f-ab14-4b8a-bd3a-d7f23f333648" height="200">
+  <h3 align="center">DesktopCanvas</h3>
+  <p align="center">An on-screen drawing and annotation tool</p>
+</p>
 
-An on-screen drawing and annotation application
+---
 
-## Description
+### Description
 
 This project was built using electron.
 The app can be used as a place to brainstorm, solve technical leetcode problems, 
-annotate online text books, all right on your desktop screen.
+annotate online text books, right on your desktop screen.
 A invisble canvas that can be painted anywhere on your desktop, in anyway you like.
 
-## Getting Started
+### Getting Started
 
-### Dependencies
-
-* Nodejs Required
-* Works on MacOS and Windows (Linux support is not gurrenteed)
+This app can be installed for free or self compiled (pacakge installation coming soon)
+* Works on Linux, macOS and Windows
 
 ### Installing
 
-* Clone the repository or Download the ZIP file
+* Download the latest version in [releases](https://github.com/IlyaasJ/DesktopCanvas/releases)
 
 ### Executing program
 
-* Open your preferred terminal got into the
-  DesktopCanvas directory and run the following command
-```
-npm install
-```
-* after the application is installed, run this command to execute
-```
-npm start
-```
-#Note: A final deloyed build does not exist
-so to reopen the app, you need to re-run the command
-above
-
-## Help
-
-* The app won't run
-    1. check if electron is installed
-    ```
-    npm ls electron
-    ```
-    2. if electron is not listed, run this command inside the DesktopCanvas directory
-    ```
-    npm install
-    ```
-    3. attempt to run the program again
-
-* The app does not install 
-    1. confirm NodeJs is installed on your machine
-    ```
-    node -v
-    ```
-    2. if NodeJs is not found or the command doesn't exist,
-      install NodeJs and retry (https://nodejs.org/en/download)
-      
-* Errors still persist
-    * Reinstall a different version of DesktopCanvas
+* Once the setup is installed, run that executable than the app should be installed on your machine!
 
 ## Version History
 
-* No current version history (heavy prototype)
+* **pre-release**
+    * [v.0.1.0](https://github.com/IlyaasJ/DesktopCanvas/releases/tag/v0.1.0-alpha)
 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details
 
-## Acknowledgments
+## Other
 
-Inspiration.
-  thinking through a leetcode problem and not having anywhere
-  to write down my thoughts was such a pain which motivated
-  me to create this tool.
+**Contributing**
+
+  I would love for anyone to contribute to this project! There is no set guidelines so feel free to send in a pull request or issue, anything helps.
+
+**Inspiration**
+
+  thinking through a leetcode problem and not having anywhere to write down my thoughts was such a pain which motivated me to create this tool.
