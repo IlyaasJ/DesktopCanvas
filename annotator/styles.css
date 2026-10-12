@@ -1,9 +1,28 @@
+:root {
+  --base: #9eb0b1;
+  --surface: #eef2f2;
+  --surface-hover: #d5dfdf;
+  --border: #b8c7c8;
+  --icon-muted: #6f8586;
+  --icon: #44585a;
+  --text: #1f2d2f;
+  --active: #2f6f73;
+
+  /* annotation colors */
+  --c-red: #e5484d;
+  --c-orange: #f08c3a;
+  --c-yellow: #f5d547;
+  --c-green: #3fb27f;
+  --c-blue: #3b82f6;
+  --c-violet: #8b6fd6;
+}
+
 html, body { margin: 0; overflow: hidden; background: transparent; }
 canvas { display: block; cursor: crosshair; }
 
 #badge {
   position: fixed; top: 8px; right: 8px; padding: 4px 10px;
-  font: 12px sans-serif; color: white; background: rgba(0, 0, 0, 0.6);
+  font: 12px sans-serif; color: var(--text); background: var(--base);
   border-radius: 6px; pointer-events: none;
 }
 
@@ -12,33 +31,47 @@ canvas { display: block; cursor: crosshair; }
   position: fixed;
   top: 0;
   left: 50%;
-  transform: translateX(-50%);   /* centers it horizontally */
+  /* closed: slid up off the top of the screen, only the notch (18px) still showing */
+  transform: translateX(-50%) translateY(calc(-100% + 18px));
+  transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   z-index: 10;                   /* sits above the canvas */
 }
 
+/* open: slid back down into view */
+#ui.open { transform: translateX(-50%) translateY(0); }
+
 #notch {
   width: 60px;
   height: 18px;
-  background: rgba(0, 0, 0, 0.75);
-  color: white;
+  background: var(--base);
+  color: var(--text);
   font: 12px sans-serif;
   text-align: center;
   line-height: 18px;
   border-radius: 0 0 10px 10px;  /* rounded bottom corners only */
   cursor: pointer;
-  order: 1
+  order: 2;                      /* always below the toolbar */
 }
+
+/* chevron rotates when the toolbar is open */
+#notch svg { transition: transform 0.3s ease; }
+#ui.open #notch svg { transform: rotate(180deg); }
 
 #toolbar {
   display: flex;
   gap: 6px;
   padding: 8px 10px;
-  background: rgba(0, 0, 0, 0.75);
+  background: var(--base);
   border-radius: 0 0 12px 12px;
-  order: 2
+  order: 1;
+}
+
+#toolbar > button {
+  height: 34px;
+  align-self: flex-start;   /* pin to the top instead of stretching */
 }
 
 /* replaces the old #colors-extra rule */
@@ -50,22 +83,19 @@ canvas { display: block; cursor: crosshair; }
   align-self: center;   /* keeps the block vertically centered in the toolbar */
 }
 
-#ui.open #toolbar { order: 1; }
-#ui.open #notch { order: 2; }
-
-#toolbar.hidden { display: none; }
-
 
 button {
+  width: 25;
+  height 25;
   font: 12px sans-serif;
-  color: white;
-  background: rgba(255, 255, 255, 0.15);
+  color: var(--text);
+  background: rgba(31, 45, 47, 0.25);
   border: none;
   border-radius: 6px;
   padding: 3px 3px;
   cursor: pointer;
 }
-button:hover { background: rgba(255, 255, 255, 0.3); }
+button:hover { background: rgba(31, 45, 47, 0.4); }
 
 button.color {
   width: 24px;
@@ -87,7 +117,7 @@ button.color {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #222;
+  background: var(--text);
   color: #fff;
   font-size: 9px;
   line-height: 10px;

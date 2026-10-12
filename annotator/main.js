@@ -7,17 +7,15 @@ const fs = require('fs');
 let drawing = true;
 let overToolbar = true;
 
-const trayIcon = nativeImage.createFromPath("images/DC_icon.png");
-const appIcon = nativeImage.createFromPath("images/DC_icon.png");
+const iconPath = path.join(__dirname, '../images/DC_Icon.png');
+const trayIcon = nativeImage.createFromPath(iconPath);
+const appIcon = nativeImage.createFromPath(iconPath);
 
 function createWindow () {
     const {x, y, width, height} = screen.getPrimaryDisplay().bounds;
     tray = new Tray(trayIcon);
     const contextMenu = Menu.buildFromTemplate([
-	{ label: 'Item1', type: 'radio' },
-	{ label: 'Item2', type: 'radio' },
-	{ label: 'Item3', type: 'radio', checked: true },
-	{ label: 'Item4', type: 'radio' }
+	{ label: 'Quit', type: "normal", click: () => app.quit()},
     ]);
 
     win = new BrowserWindow({
@@ -34,8 +32,8 @@ function createWindow () {
     });
     
     win.setAlwaysOnTop(true, 'screen-saver');
-    win.loadFile('annotator/index.html');
-    tray.setToolTip('This is my application.');
+    win.loadFile(path.join(__dirname, 'index.html'));
+    tray.setToolTip('DesktopCanvas');
     tray.setContextMenu(contextMenu);
 }
 

@@ -1,11 +1,22 @@
 {
   "name": "desktopcanvas",
-  "version": "1.0.0",
+  "version": "0.1.0-alpha",
   "main": "annotator/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
-  },
+     "start": "electron .",
+     "pack": "electron-builder --dir",
+     "dist": "electron-builder",
+     "test": "echo \"Error: no test specified\" && exit 1"
+   },
+   "build": {
+     "appId": "com.ilyaasj.desktopcanvas",
+     "productName": "DesktopCanvas",
+     "icon": "images/DC_Icon.png",
+     "files": ["annotator/**/*", "images/**/*", "package.json"],
+     "directories": { "output": "dist" },
+     "mac": { "category": "public.app-category.productivity", "target": "dmg" },
+     "win": { "target": "nsis" }
+   },
   "keywords": [],
   "author": "",
   "license": "ISC",

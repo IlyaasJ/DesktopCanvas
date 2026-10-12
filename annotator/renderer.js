@@ -4,7 +4,7 @@ const badge = document.getElementById('badge')
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
-let color = '#ff3b30', size = 3, erasing = false
+let color = '#ff3b30', size = 8, erasing = false
 
 
 let drawMode = true   // matches `drawing = true` in main.js
@@ -16,7 +16,7 @@ function toggleIcon(name, on) {
 }
 
 function setModeIcon(on) {
-  document.getElementById('mode').innerHTML = toggleIcon('paint', on)
+  document.getElementById('pen').innerHTML = toggleIcon('paint', on)
 }
 
 function setEraserIcon(on) {
@@ -142,7 +142,7 @@ ui.addEventListener('mouseleave', () => window.api.setInteractive(false))
 notch.addEventListener('click', () => {
   const open = ui.classList.toggle('open');
   toolbar.classList.toggle('hidden', !open);
-  //notch.textContent = open ? '▴' : '▾';
+  notch.textContent = open ? '▴' : '▾';
 });
 
 //Colors
@@ -178,10 +178,8 @@ document.getElementById('undo').addEventListener('click', undo)
 document.getElementById('redo').addEventListener('click', redo)
 document.getElementById('clear').addEventListener('click', clearAll)
 
-document.getElementById('mode').addEventListener('click', () => {
+document.getElementById('pen').addEventListener('click', () => {
     window.api.toggleMode();
-
-    document.getElementById('mode').innerHTML = toggleIcon("paint", drawMode);
 })
 
 
