@@ -177,6 +177,8 @@ document.getElementById('eraser').addEventListener('click', () => {
 document.getElementById('undo').addEventListener('click', undo)
 document.getElementById('redo').addEventListener('click', redo)
 document.getElementById('clear').addEventListener('click', clearAll)
+document.getElementById('clear').innerHTML = icons["clear-off"] 
+print(icons)
 
 document.getElementById('pen').addEventListener('click', () => {
     window.api.toggleMode();
