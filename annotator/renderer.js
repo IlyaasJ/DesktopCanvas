@@ -4,85 +4,16 @@ const badge = document.getElementById('badge')
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
-let color = '#ff3b30', size = 8, erasing = false
-
-
-let drawMode = true   // matches `drawing = true` in main.js
+let color = '#ff3b30'
+let sizes = {pen: 8, eraser: 16, trace: 2};
+let state = "pen" // states: pen, erase, trace
+let canPass = false   // matches `drawing = true` in main.js
 let icons = {}
-
-//Sets all Icons
-function toggleIcon(name, on) {
-  return icons[`${name}-${on ? 'on' : 'off'}`] ?? ''
-}
-
-function setModeIcon(on) {
-  document.getElementById('pen').innerHTML = toggleIcon('paint', on)
-}
-
-function setEraserIcon(on) {
-  document.getElementById('eraser').innerHTML = toggleIcon('eraser', on)
-}
-
-async function init() {
-    icons = await window.api.all()
-    setModeIcon(drawMode)
-    setEraserIcon(erasing)
-    notch.innerHTML = icons['chevron-down'] ?? '▾'
-}
-init()
-
-console.log(icons)
-
 const strokes = []     // finished strokes
 let redoStack = []     // undone strokes, available for redo
 let current = null     // the stroke being drawn right now
 
-// Draw one segment between two points using a stroke's style
-function drawSegment(stroke, from, to) {
-  ctx.globalCompositeOperation = stroke.erasing ? 'destination-out' : 'source-over'
-  ctx.strokeStyle = stroke.color
-  ctx.lineWidth = stroke.width
-  ctx.lineCap = 'round'
-  ctx.lineJoin = 'round'
-  ctx.beginPath()
-  ctx.moveTo(from.x, from.y)
-  ctx.lineTo(to.x, to.y)
-  ctx.stroke()
-}
 
-// Wipe the canvas and replay every saved stroke in order
-function redraw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  for (const stroke of strokes) {
-    for (let i = 1; i < stroke.points.length; i++) {
-      drawSegment(stroke, stroke.points[i - 1], stroke.points[i])
-    }
-  }
-}
-
-canvas.addEventListener('pointerdown', (e) => {
-  current = {
-    color,
-    width: erasing ? 20 : size,
-    erasing,
-    points: [{ x: e.clientX, y: e.clientY }]
-  }
-})
-
-canvas.addEventListener('pointermove', (e) => {
-  if (!current) return
-  const prev = current.points[current.points.length - 1]
-  const next = { x: e.clientX, y: e.clientY }
-  current.points.push(next)
-  drawSegment(current, prev, next)   // draw just the new piece (fast)
-})
-
-window.addEventListener('pointerup', () => {
-  if (!current) return
-  strokes.push(current)
-  redoStack = []        // a new stroke erases the redo "future"
-  current = null
-})
 
 function undo() {
   if (strokes.length === 0) return
@@ -102,10 +33,91 @@ function clearAll() {
   redraw()
 }
 
+//Waits for all data
+async function init() {
+    icons = await window.api.all()
+    notch.innerHTML = icons['chevron-down'] ?? '▾'
+}
+init()
+
+
+// Draw one segment between two points using a stroke's style
+function drawSegment(stroke, from, to) {
+    const size = sizes[state]
+    let GCO
+    if (state == "erase") GCO = 'destination-out' 
+    if (state == "pen")	  GC0 = 'source-over'
+
+    ctx.globalCompositeOperation = GCO
+    ctx.strokeStyle = stroke.color
+    ctx.lineWidth = size
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    ctx.beginPath()
+    ctx.moveTo(from.x, from.y)
+    ctx.lineTo(to.x, to.y)
+    ctx.stroke()
+}
+
+// Wipe the canvas and replay every saved stroke in order
+function redraw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  for (const stroke of strokes) {
+    for (let i = 1; i < stroke.points.length; i++) {
+      drawSegment(stroke, stroke.points[i - 1], stroke.points[i])
+    }
+  }
+}
+
+//Sets all Icons
 function toggleIcon(name, on) {
   return icons[`${name}-${on ? 'on' : 'off'}`] ?? ''
 }
 
+//Toggles States
+function toggleState(to){
+    if(state == to){
+	state = ""
+
+	canPass = true
+	toolbar.classList.toggle('hidden', true);
+	badge.textContent = "pass"
+	return
+    }
+
+    if (!state){
+	canPass = false
+	toolbar.classList.toggle('hidden', false);
+    }
+
+    state = to
+    badge.textContent = state
+}
+
+
+canvas.addEventListener('pointerdown', (e) => {
+  current = {
+    color,
+    points: [{ x: e.clientX, y: e.clientY }]
+  }
+})
+
+canvas.addEventListener('pointermove', (e) => {
+    if (!current) return
+    const prev = current.points[current.points.length - 1]
+    const next = { x: e.clientX, y: e.clientY }
+    current.points.push(next)
+    if (state == "pen" || state == "erase") {
+	drawSegment(current, prev, next)   // draw just the new piece (fast)
+    }
+})
+
+window.addEventListener('pointerup', () => {
+  if (!current) return
+  strokes.push(current)
+  redoStack = []        // a new stroke erases the redo "future"
+  current = null
+})
 
 // Keyboard shortcuts: 1-4 colors, E eraser, [ ] size, Ctrl+Z / Ctrl+Y undo / redo
 const colors = { '1': '#000000', '2': '#FFFFFF', '3': '#0a84ff', '4': '#ffd60a' }
@@ -116,17 +128,16 @@ window.addEventListener('keydown', (e) => {
     return
   }
   if (colors[e.key]) { color = colors[e.key]; erasing = false }
-  if (e.key === 'e') erasing = !erasing
-  if (e.key === '[') size = Math.max(1, size - 3)
-  if (e.key === ']') size += 3
+  if (e.key === 'e') toggleState("erase")
+  if (e.key === '[') sizes[state] = Math.max(1, sizes[state] - 3)
+  if (e.key === ']') sizes[state] += 3
 })
 
 // Messages from main.js
 window.api.onClear(clearAll)
 window.api.onMode((on) => {
-  badge.textContent = on ? 'DRAW' : 'PASS'
-  drawMode = on
-  setModeIcon(on)
+    badge.textContent = on ? state : 'PASS'
+    canPass = true
 })
 
 // ---- Toolbar ----
@@ -169,23 +180,25 @@ wheelInput.addEventListener('input', () => {
   applying = false;
 });
 
-document.getElementById('eraser').innerHTML = toggleIcon("eraser", erasing)
+//Drawing States
+//document.getElementById('eraser').innerHTML = toggleIcon("eraser", erasing)
 document.getElementById('eraser').addEventListener('click', () => {
-    erasing = !erasing
-    document.getElementById('eraser').innerHTML = toggleIcon("eraser", erasing);
+    toggleState("erase")
+    //document.getElementById('eraser').innerHTML = toggleIcon("eraser", erasing);
 })
-document.getElementById('undo').addEventListener('click', undo)
-document.getElementById('redo').addEventListener('click', redo)
-document.getElementById('clear').addEventListener('click', clearAll)
-document.getElementById('clear').innerHTML = icons["clear-off"] 
-print(icons)
 
 document.getElementById('pen').addEventListener('click', () => {
+    toggleState("pen")
     window.api.toggleMode();
 })
 
 
+//Utlity
 document.getElementById('quit').addEventListener('click', () => window.api.quit())
+document.getElementById('undo').addEventListener('click', undo)
+document.getElementById('redo').addEventListener('click', redo)
+document.getElementById('clear').addEventListener('click', clearAll)
+document.getElementById('clear').innerHTML = icons["clear-off"] 
 document.getElementById('save').addEventListener('click', () => {
     const dataURL = canvas.toDataURL("image/png")
 
@@ -193,3 +206,6 @@ document.getElementById('save').addEventListener('click', () => {
 
     window.api.save(base64Data);
 })
+
+
+

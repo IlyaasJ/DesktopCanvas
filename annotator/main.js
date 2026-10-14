@@ -35,7 +35,6 @@ function createWindow () {
     win.loadFile(path.join(__dirname, 'index.html'));
     tray.setToolTip('DesktopCanvas');
     tray.setContextMenu(contextMenu);
-    win.webContents.openDevTools()
 }
 
 function cacheSVGs() {
