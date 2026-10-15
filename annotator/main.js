@@ -4,7 +4,7 @@ const path = require('path')
 let win;
 let tray;
 const fs = require('fs');
-let drawing = true;
+let drawing = false;
 let overToolbar = true;
 
 const iconPath = path.join(__dirname, '../images/DC_Icon.png');

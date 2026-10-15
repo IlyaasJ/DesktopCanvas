@@ -6,8 +6,8 @@ canvas.height = window.innerHeight
 
 let color = '#ff3b30'
 let sizes = {pen: 8, eraser: 16, trace: 2};
-let state = "pen" // states: pen, erase, trace
-let canPass = false   // matches `drawing = true` in main.js
+let state = "" // states: pen, erase, trace
+let canPass = true   // matches `drawing = true` in main.js
 let icons = {}
 const strokes = []     // finished strokes
 let redoStack = []     // undone strokes, available for redo
@@ -33,12 +33,30 @@ function clearAll() {
   redraw()
 }
 
-//Waits for all data
-async function init() {
+//Sets all Icons
+function toggleIcon(name, on) {
+  return icons[`${name}-${on ? 'on' : 'off'}`] ?? ''
+}
+
+//Waits for all icon data
+async function initIcons() {
     icons = await window.api.all()
     notch.innerHTML = icons['chevron-down'] ?? '▾'
+
+    for(const [key, value] of Object.entries(icons))
+    {
+	const iconName = key.replace(/-on|-off/g, "")
+
+	const button = document.getElementById(iconName)
+	
+	if (button){
+	    button.innerHTML = toggleIcon(iconName, false)
+	}
+    }
+	
+
 }
-init()
+initIcons()
 
 
 // Draw one segment between two points using a stroke's style
@@ -46,7 +64,7 @@ function drawSegment(stroke, from, to) {
     const size = sizes[state]
     let GCO
     if (state == "erase") GCO = 'destination-out' 
-    if (state == "pen")	  GC0 = 'source-over'
+    if (state == "pen")	  GCO = 'source-over'
 
     ctx.globalCompositeOperation = GCO
     ctx.strokeStyle = stroke.color
@@ -69,29 +87,24 @@ function redraw() {
   }
 }
 
-//Sets all Icons
-function toggleIcon(name, on) {
-  return icons[`${name}-${on ? 'on' : 'off'}`] ?? ''
-}
 
 //Toggles States
 function toggleState(to){
     if(state == to){
 	state = ""
 
-	canPass = true
-	toolbar.classList.toggle('hidden', true);
-	badge.textContent = "pass"
+	document.getElementById('toolbar').classList.toggle('hidden', true);
+	window.api.toggleMode();
 	return
     }
 
     if (!state){
-	canPass = false
-	toolbar.classList.toggle('hidden', false);
+	document.getElementById('toolbar').classList.toggle('hidden', false);
+	window.api.toggleMode();
     }
 
     state = to
-    badge.textContent = state
+    badge.textContent = state.toUpperCase()
 }
 
 
@@ -136,8 +149,8 @@ window.addEventListener('keydown', (e) => {
 // Messages from main.js
 window.api.onClear(clearAll)
 window.api.onMode((on) => {
-    badge.textContent = on ? state : 'PASS'
-    canPass = true
+    badge.textContent = on ? state.toUpperCase() : 'PASS'
+    canPass = on
 })
 
 // ---- Toolbar ----
@@ -181,15 +194,14 @@ wheelInput.addEventListener('input', () => {
 });
 
 //Drawing States
-//document.getElementById('eraser').innerHTML = toggleIcon("eraser", erasing)
 document.getElementById('eraser').addEventListener('click', () => {
     toggleState("erase")
-    //document.getElementById('eraser').innerHTML = toggleIcon("eraser", erasing);
+    document.getElementById('eraser').innerHTML = toggleIcon("eraser", erasing);
 })
 
 document.getElementById('pen').addEventListener('click', () => {
     toggleState("pen")
-    window.api.toggleMode();
+    document.getElementById('pen').innerHTML = toggleIcon("pen", erasing);
 })
 
 
