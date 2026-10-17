@@ -62,11 +62,41 @@ canvas { display: block; cursor: crosshair; }
 
 #toolbar {
     display: flex;
-    gap: 6px;
+    flex-direction: row;     /* NOT column */
+    flex-wrap: wrap;         /* lets the slider drop to its own line */
+    gap: 1px 6px;            /* row gap, column gap */
     padding: 8px 10px;
     background: var(--base);
     border-radius: 0 0 12px 12px;
     order: 1;
+}
+
+#size-control {
+    flex: 0 0 0;
+    width: 0;
+    min-width: 100%;
+    display: flex;
+    align-items: center;
+
+    /* collapsed by default */
+    max-height: 0;
+    margin-top: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height 0.3s ease, margin-top 0.3s ease, opacity 0.2s ease;
+}
+
+#size-control.show {
+    max-height: 30px;     /* tall enough for the slider thumb */
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#pen-size {
+    flex: 1;
+    width: auto;
+    accent-color: var(--surface)
 }
 
 #toolbar > button {
@@ -74,15 +104,34 @@ canvas { display: block; cursor: crosshair; }
     align-self: flex-start;   /* pin to the top instead of stretching */
 }
 
-/* replaces the old #colors-extra rule */
 #colors {
     display: grid;
-    grid-template-columns: repeat(4, auto);
+    grid-template-columns: repeat(3, auto);
     grid-auto-rows: auto;
     gap: 6px;
     align-self: center;   /* keeps the block vertically centered in the toolbar */
 }
 
+#tools {
+    display: grid;
+    grid-template-columns: repeat(5, auto);
+    grid-auto-rows: auto;
+    gap: 6px;
+    align-self: center;   /* keeps the block vertically centered in the toolbar */
+}
+
+button.tools {
+    width: 25px;
+    height: 25px;
+    padding: 0;
+}
+
+button { transition: transform 0.12s ease, background 0.15s; }
+button:active { transform: scale(1.15); }
+button.active {
+    outline: 2px solid #fff;
+    outline-offset: -2px;   /* keeps the outline inside the button so it doesn't get clipped or shift layout */
+}
 
 button {
     width: 25;
@@ -105,8 +154,8 @@ svg {
 button:hover { background: rgba(31, 45, 47, 0.4); }
 
 button.color {
-    width: 24px;
-    height: 24px;
+    width: 25px;
+    height: 25px;
     padding: 0;
     border-radius: 50%;
 }
